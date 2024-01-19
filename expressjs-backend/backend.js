@@ -1,9 +1,10 @@
 import userServices from "./user-services.js";
 import express from "express";
 import cors from "cors";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import https from "https";
+import fs from "fs";
 
 const app = express();
 const port = 8000;
@@ -57,6 +58,13 @@ app.post("/account/register", async (req, res) => {
     }
 })
 
-app.listen(port, () => {
-    console.log(`listening at http://localhost:${port}`);
+https.createServer(
+    {
+        key: fs.readFileSync("./cert/key.pem"),
+        cert: fs.readFileSync("./cert/cert.pem"),
+    },
+    app
+)
+.listen(port, () => {
+    console.log(`listening at https://localhost:${port}`);
 });
