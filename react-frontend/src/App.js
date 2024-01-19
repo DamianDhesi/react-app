@@ -8,7 +8,7 @@ import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { CheckToken } from "./CheckToken";
 import { Regestration } from "./Regestration";
 
-export const backendPath = "http://localhost:8000";
+export const backendPath = "https://localhost:8000";
 
 const App = () => {
   

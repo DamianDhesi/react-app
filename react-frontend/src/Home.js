@@ -12,7 +12,7 @@ export const Home = () => {
     .then((response) => {
         window.alert(JSON.stringify(response.data));
     })
-  }
+  };
 
   return (
     <>
