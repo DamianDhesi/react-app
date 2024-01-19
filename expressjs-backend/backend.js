@@ -2,12 +2,18 @@ import userServices from "./user-services.js";
 import express from "express";
 import cors from "cors";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const app = express();
 const port = 8000;
 
 app.use(express.json());
 app.use(cors());
+
+function generateAccessToken(name) {
+    return jwt.sign(name, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+}
 
 app.get("/users", async (req, res) => {
     try {
@@ -24,7 +30,12 @@ app.post("/account/login", async (req, res) => {
     const password = req.body.password.trim();
     const result = await userServices.verifyUser(userid, password);
 
-    res.send(result);
+    if (result != null) {
+        const token = generateAccessToken({name: result});
+        res.send(token);
+    } else {
+        res.send(result);
+    }
 });
 
 app.post("/account/register", async (req, res) => {
@@ -37,11 +48,9 @@ app.post("/account/register", async (req, res) => {
      * and user-password combo does not already exist*/
     const existingUser = await userServices.findUserByName(userid);
     if (valpass === password && password !== password.toLowerCase() && /\d/.test(password) 
-            && specialChars.test(password) && existingUser == null) {
-        const token = crypto.randomBytes(16).toString('hex');
+            && specialChars.test(password) && existingUser[0] == null) {
         const savedUser = await userServices.addUser({ name: userid, 
-                                                       password: password, 
-                                                       token: token});
+                                                       password: password});
         res.send(savedUser);
     } else {
         res.send(null);

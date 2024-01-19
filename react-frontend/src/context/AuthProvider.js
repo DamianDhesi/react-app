@@ -6,8 +6,14 @@ import { backendPath } from "../App";
 const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
-  
+    
     const [token, setToken] = useState(null);
+
+    var cookie = `${document.cookie}`;
+    cookie = cookie.substring(cookie.indexOf("=") + 1);
+    if (token !== cookie && cookie !== "") {
+        setToken(cookie);
+    }
   
     const handleLogin = async ({username, password}) => {
         axios.post(backendPath + "/account/login", {
@@ -19,6 +25,12 @@ export const AuthProvider = ({ children }) => {
 
             if (token !== "") {
                 setToken(token);
+
+                //set cookie
+                const exper = new Date();
+                exper.setTime(exper.getTime() + (2 * 60 * 1000)); //5 minute expiration
+                document.cookie = `token=${token}; expires=${exper.toUTCString()}; path=/`;
+
                 navigate("/landing");
             } else {
                 window.alert("Invalid user/password");
@@ -27,6 +39,8 @@ export const AuthProvider = ({ children }) => {
     };
 
   const handleLogout = () => {
+
+    document.cookie = `token=; path=/`;
     setToken(null);
   };
 

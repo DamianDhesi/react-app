@@ -33,21 +33,21 @@ async function addUser(user) {
 }
 
 async function findUserByName(name) {
-    return await userModel.find({ name: name }).select("password token").exec();
+    return await userModel.find({ name: name }).select("password").exec();
 }
 
 async function findUserByPassword(password) {
-    return await userModel.find({ password: password }).select("name token").exec();
+    return await userModel.find({ password: password }).select("name").exec();
 }
 
 async function verifyUser(name, password) {
-    const existingUser = await userModel.findOne({name: name, password: password}).select("token").exec();
+    const existingUser = await userModel.findOne({name: name, password: password}).select("name").exec();
     
     if (existingUser == null) {
         return null;
     }
 
-    return existingUser.token;
+    return existingUser.name;
 }
 
 export default {
