@@ -1,24 +1,22 @@
 import mongoose from "mongoose";
 import userModel from "./user.js";
+import "dotenv/config";
 
 // uncomment the following line to view mongoose debug messages
 // mongoose.set("debug", true);
 
 mongoose
-    .connect("mongodb://127.0.0.1:27017/users", {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+    .connect(`mongodb+srv://damiandhesi:${process.env.PASSWORD}@cluster0.pnj1u8q.mongodb.net/?retryWrites=true&w=majority`)
     .catch((error) => console.log(error));
 
-async function getUsers(name, contact) {
+async function getUsers(name, password) {
     let result;
-    if (name === undefined && contact === undefined) {
-        result = await userModel.find();
-    } else if (name && !job) {
+    if (name === undefined && password === undefined) {
+        result = await userModel.find().select("name").exec();
+    } else if (name && !password) {
         result = await findUserByName(name);
-    } else if (job && !name) {
-        result = await findUserByContact(contact);
+    } else if (password && !name) {
+        result = await findUserByPassword(password);
     }
     return result;
 }
@@ -35,16 +33,27 @@ async function addUser(user) {
 }
 
 async function findUserByName(name) {
-    return await userModel.find({ name: name });
+    return await userModel.find({ name: name }).select("password token").exec();
 }
 
-async function findUserByContact(contact) {
-    return await userModel.find({ contact: contact });
+async function findUserByPassword(password) {
+    return await userModel.find({ password: password }).select("name token").exec();
+}
+
+async function verifyUser(name, password) {
+    const existingUser = await userModel.findOne({name: name, password: password}).select("token").exec();
+    
+    if (existingUser == null) {
+        return null;
+    }
+
+    return existingUser.token;
 }
 
 export default {
     addUser,
     getUsers,
     findUserByName,
-    findUserByContact,
+    findUserByPassword,
+    verifyUser,
 };

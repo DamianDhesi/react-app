@@ -14,7 +14,7 @@ export const Regestration = () => {
             valpass: valpass
         })
         .then((response) => {
-            if (response.data === "pass") {
+            if (response.data !== "") {
                 window.alert("Successfully created new user!");
             } else {
                 window.alert("Invalid password or user-password combination already exists");

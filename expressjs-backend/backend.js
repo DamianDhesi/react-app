@@ -1,41 +1,50 @@
-import * as user_services from "./user-services"
+import userServices from "./user-services.js";
+import express from "express";
+import cors from "cors";
+import crypto from "crypto";
 
-const express = require('express');
 const app = express();
 const port = 8000;
-var hashMap = new Map();
-var users = [];
 
-hashMap.set("bj" + "pass424", "2342f2f1d131rf12");
-users.push("bj");
 app.use(express.json());
-var cors = require("cors");
 app.use(cors());
 
-app.get("/users", (req, res) => {
-    res.send(users);
+app.get("/users", async (req, res) => {
+    try {
+        const users = await userServices.getUsers(undefined, undefined);
+        res.send({ users_list: users});
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error ocurred in the server");
+    }
 });
 
-app.post("/account/login", (req, res) => {
-    var key = req.body.userid + req.body.password;
-    res.send(hashMap.get(key));
+app.post("/account/login", async (req, res) => {
+    const userid = req.body.userid.trim();
+    const password = req.body.password.trim();
+    const result = await userServices.verifyUser(userid, password);
+
+    res.send(result);
 });
 
-app.post("/account/register", (req, res) => {
-    var userid = req.body.userid;
-    var password = req.body.password;
-    var valpass = req.body.valpass;
-    var specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+app.post("/account/register", async (req, res) => {
+    const userid = req.body.userid.trim();
+    const password = req.body.password.trim();
+    const valpass = req.body.valpass.trim()
+    const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
     /*check for at least one capital letter, one number, one symbol, validate password was typed twice correctly, 
      * and user-password combo does not already exist*/
+    const existingUser = await userServices.findUserByName(userid);
     if (valpass === password && password !== password.toLowerCase() && /\d/.test(password) 
-        && specialChars.test(password) && hashMap.get(userid + password) == null) {
-        hashMap.set(userid + password, require("crypto").randomBytes(16).toString('hex'));
-        users.push(userid);
-        res.send("pass");
+            && specialChars.test(password) && existingUser == null) {
+        const token = crypto.randomBytes(16).toString('hex');
+        const savedUser = await userServices.addUser({ name: userid, 
+                                                       password: password, 
+                                                       token: token});
+        res.send(savedUser);
     } else {
-        res.send("fail");
+        res.send(null);
     }
 })
 

@@ -10,7 +10,7 @@ export const Home = () => {
   const getUsers = async () => {
     axios.get(backendPath + "/users")
     .then((response) => {
-        window.alert(response.data);
+        window.alert(JSON.stringify(response.data));
     })
   }
 
