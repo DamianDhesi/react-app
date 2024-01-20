@@ -10,7 +10,7 @@ const app = express();
 const port = 8000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors("https://localhost:3000"));
 
 function generateAccessToken(name) {
     return jwt.sign(name, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
