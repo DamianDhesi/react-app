@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors("https://localhost:3000"));
 
 function generateAccessToken(name) {
-    return jwt.sign(name, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    return jwt.sign(name, process.env.TOKEN_SECRET, { expiresIn: '180s' });
 }
 
 app.get("/users", async (req, res) => {
@@ -57,8 +57,8 @@ app.post("/account/register", async (req, res) => {
 
 https.createServer(
     {
-        key: fs.readFileSync("./cert/key.pem"),
-        cert: fs.readFileSync("./cert/cert.pem"),
+        key: fs.readFileSync(process.env.SSL_KEY_FILE),
+        cert: fs.readFileSync(process.env.SSL_CRT_FILE),
     },
     app
 )

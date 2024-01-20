@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
                 //set cookie
                 const exper = new Date();
                 exper.setTime(exper.getTime() + (2 * 60 * 1000)); //5 minute expiration
-                document.cookie = `token=${token}; expires=${exper.toUTCString()}; path=/`;
+                document.cookie = `token=${token}; expires=${exper.toUTCString()}; secure; path=/`;
 
                 navigate("/landing");
             } else {
