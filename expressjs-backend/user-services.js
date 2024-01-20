@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import userModel from "./user.js";
 import "dotenv/config";
+import bcrypt from "bcryptjs-react";
 
 // uncomment the following line to view mongoose debug messages
 // mongoose.set("debug", true);
@@ -41,13 +42,19 @@ async function findUserByPassword(password) {
 }
 
 async function verifyUser(name, password) {
-    const existingUser = await userModel.findOne({name: name, password: password}).select("name").exec();
+    const existingUser = await userModel.findOne({name: name}).select("name password").exec();
     
+    //check if user exists
     if (existingUser == null) {
         return null;
     }
 
-    return existingUser.name;
+    //compare given password and stored password
+    if (await bcrypt.compare(password, existingUser.password)) {
+        return existingUser.name;
+    }
+
+    return null;
 }
 
 export default {

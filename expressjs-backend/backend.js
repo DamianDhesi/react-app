@@ -41,15 +41,12 @@ app.post("/account/login", async (req, res) => {
 
 app.post("/account/register", async (req, res) => {
     const userid = req.body.userid.trim();
-    const password = req.body.password.trim();
-    const valpass = req.body.valpass.trim()
-    const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const password = req.body.password;
 
     /*check for at least one capital letter, one number, one symbol, validate password was typed twice correctly, 
      * and user-password combo does not already exist*/
     const existingUser = await userServices.findUserByName(userid);
-    if (valpass === password && password !== password.toLowerCase() && /\d/.test(password) 
-            && specialChars.test(password) && existingUser[0] == null) {
+    if (existingUser[0] == null) {
         const savedUser = await userServices.addUser({ name: userid, 
                                                        password: password});
         res.send(savedUser);
