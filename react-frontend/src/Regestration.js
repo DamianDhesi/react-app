@@ -10,11 +10,11 @@ export const Regestration = () => {
 
     const handleClick = async () => {
         //check if password is valid
-        const specialChars = /[ `!@#$%^&*()_+\-=[]{};':"\\|,.<>\/?~]/;
-        if (valpass.trim() !== password.trim() || password === password.toLowerCase() || !/\d/.test(password) 
-            || !specialChars.test(password)) {
+        const specialChars = /[ `!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/;
+        if (!(valpass.trim() === password.trim() && password !== password.toLowerCase() && /\d/.test(password) 
+            && specialChars.test(password))) {
                 window.alert("Invalid password. Needs atleast 1 uppercase, 1 number, and 1 special char");
-                return; //fix, currently rejecting valid passwords!!!
+                return;
         }
 
         //generate salt and hash password
