@@ -5,9 +5,19 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import https from "https";
 import fs from "fs";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 const port = 8000;
+
+// set up rate limiter: maximum of five requests per minute
+var limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // max 100 requests per windowMs
+});
+
+// apply rate limiter to all requests
+app.use(limiter);
 
 app.use(express.json());
 app.use(cors("https://localhost:3000"));
