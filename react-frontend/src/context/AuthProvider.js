@@ -16,6 +16,17 @@ export const AuthProvider = ({ children }) => {
     }
   
     const handleLogin = async ({username, password}) => {
+        if (username === null && password === null) {
+          var cookie = `${document.cookie}`;
+          cookie = cookie.substring(cookie.indexOf("=") + 1);
+          if (token !== cookie && cookie !== "") {
+              setToken(cookie);
+          }
+          
+          navigate("/landing");
+          return;
+        }
+
         axios.post(backendPath + "/account/login", {
             userid: username,
             password: password
@@ -28,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
                 //set cookie
                 const exper = new Date();
-                exper.setTime(exper.getTime() + (2 * 60 * 1000)); //5 minute expiration
+                exper.setTime(exper.getTime() + (2 * 60 * 1000)); //2 minute expiration
                 document.cookie = `token=${token}; expires=${exper.toUTCString()}; secure; path=/`;
 
                 navigate("/landing");

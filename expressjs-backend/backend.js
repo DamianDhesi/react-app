@@ -5,14 +5,18 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import https from "https";
 import fs from "fs";
+import {router as authRouter} from "./routes/oath.js";
+import {router as requestRouter} from "./routes/request.js";
 
 const app = express();
 const port = 8000;
 
+app.use("/oath", authRouter);
+app.use("/request", requestRouter);
 app.use(express.json());
 app.use(cors("https://localhost:3000"));
 
-function generateAccessToken(name) {
+export function generateAccessToken(name) {
     return jwt.sign(name, process.env.TOKEN_SECRET, { expiresIn: '180s' });
 }
 

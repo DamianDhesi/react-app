@@ -1,16 +1,28 @@
 import { useAuth } from "./context/AuthProvider";
 import React from 'react';
+// import axios from "axios";
+import { backendPath } from "./App";
+
 export const Home = () => {
   const { value } = useAuth();
   const [username, setUserName] = React.useState("");
   const [password, setPassWord] = React.useState("");
   const handleClick = () => value.onLogin({username, password});
-//   const getUsers = async () => {
-//     axios.get(backendPath + "/users")
-//     .then((response) => {
-//         window.alert(JSON.stringify(response.data));
-//     })
-//   };
+  const useOAuth = async () => {
+    const response = await fetch(backendPath + "/request", {method: "post"});
+    const data = await response.json()
+    window.location.assign(data.url);
+
+    const queryParameters = new URLSearchParams(window.location.search);
+    const google_token = queryParameters.get("token");
+    if (google_token) {
+        //set cookie
+        const exper = new Date();
+        exper.setTime(exper.getTime() + (2 * 60 * 1000)); //2 minute expiration
+        document.cookie = `token=${google_token}; expires=${exper.toUTCString()}; secure; path=/`;
+        await value.onLogin({username: null, password: null});
+    }
+};
 
   return (
     <>
@@ -24,9 +36,9 @@ export const Home = () => {
         <button type="button" onClick={handleClick}>
             Sign In
         </button>
-        {/* <button type="button" onClick={getUsers}>
-            See All Users
-        </button> */}
+        <button type="button" onClick={useOAuth}>
+            Use OAuth
+        </button>
     </>
   );
   };
