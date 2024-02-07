@@ -1,6 +1,5 @@
 import { useAuth } from "./context/AuthProvider";
 import React from 'react';
-// import axios from "axios";
 import { backendPath } from "./App";
 
 export const Home = () => {
@@ -12,7 +11,9 @@ export const Home = () => {
     const response = await fetch(backendPath + "/request", {method: "post"});
     const data = await response.json()
     window.location.assign(data.url);
-
+  };
+  
+  window.onload = () => {
     const queryParameters = new URLSearchParams(window.location.search);
     const google_token = queryParameters.get("token");
     if (google_token) {
@@ -20,9 +21,9 @@ export const Home = () => {
         const exper = new Date();
         exper.setTime(exper.getTime() + (2 * 60 * 1000)); //2 minute expiration
         document.cookie = `token=${google_token}; expires=${exper.toUTCString()}; secure; path=/`;
-        await value.onLogin({username: null, password: null});
+        value.onLogin({username: null, password: null});
     }
-};
+  }
 
   return (
     <>
